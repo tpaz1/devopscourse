@@ -1,0 +1,21 @@
+# Base image
+FROM python:3.7-alpine3.9
+
+# Cd into app
+WORKDIR /usr/src/app
+
+# Exposing http port
+EXPOSE 8080
+
+# Copying the requirements.txt files into app
+COPY ./requirements.txt .
+
+# Download dependencies for the app from requirements
+RUN pip install -r requirements.txt
+
+# copying api and run application into app
+ADD api ./api
+COPY ./run_app.py .
+
+CMD ["python3", "./run_app.py"]
+
