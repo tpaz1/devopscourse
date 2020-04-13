@@ -1,0 +1,80 @@
+## Phase I - Builder source
+# Base image
+FROM python:3.7 as builder
+
+# Cd into app
+WORKDIR /usr/src/app
+
+# Copying application dir
+COPY ./ .
+
+# Change dir into wheels dir
+WORKDIR /wheels
+
+# Copying requirements
+RUN cp /usr/src/app/requirements.txt .
+
+# Running pip install wheel
+RUN pip wheel -r ./requirements.txt
+
+
+## Phase II - Lint tests
+# Base image 
+FROM eeacms/pylint:latest as linting
+
+# Change dir into /code 
+WORKDIR /code
+
+# Copying cfg files into etc dir
+COPY --from=builder /usr/src/app/pylint.cfg /etc/pylint.cfg
+
+# Copying .py files into code dir
+COPY --from=builder /usr/src/app/*.py ./
+
+# Run lint test on py files
+RUN ["/docker-entrypoint.sh", "pylint"]
+
+## Phase III - Unit test
+# Base image
+FROM python:latest as unit-tests
+
+# Change dir into app
+WORKDIR /usr/src/app
+
+# Copy all packages
+COPY --from=builder /wheels /wheels
+RUN     pip install -r /wheels/requirements.txt \
+                      -f /wheels \
+       && rm -rf /wheels \
+       && rm -rf /root/.cache/pip/* 
+
+# Copying app dir from builder
+COPY --from=builder /usr/src/app ./
+
+# run unit test
+RUN ["make", "test"]
+
+
+#  Phase IV
+# Base image 
+FROM python:3.8-slim as serve
+
+# Change dir into app
+WORKDIR /usr/src/app
+
+# Copy all packages
+COPY --from=builder /wheels /wheels
+RUN     pip install -r /wheels/requirements.txt \
+                      -f /wheels \
+       && rm -rf /wheels \
+       && rm -rf /root/.cache/pip/*
+
+# Copynig all .py files from builder
+COPY --from=builder /usr/src/app/*.py ./
+
+# Copying api from builder
+COPY --from=builder /usr/src/app/api ./api
+
+# Running command
+CMD ["python", "run_app.py"]
+
