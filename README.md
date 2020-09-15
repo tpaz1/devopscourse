@@ -1,2 +1,1 @@
-# devopscourse
-devops course repo
+# `multistage Dockerfile` tutorial
