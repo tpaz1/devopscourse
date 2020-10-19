@@ -24,4 +24,4 @@ What we've accomplished:
 
 - and of course the size - Multistage build vs single stage build
 
-![alt text]()
+![alt text](https://github.com/tpaz1/multi-stage_tutorial/blob/master/Screenshot%20from%202020-10-19%2023-52-42.png)
