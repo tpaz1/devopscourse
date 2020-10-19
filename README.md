@@ -22,6 +22,6 @@ What we've accomplished:
 
 - Meaning that the developer don't need to wait for a CI/CD to run the tests or wait for his turn / job completion in the CI/CD.
 
-### - and of course the size - Multistage build vs single stage build
+- and of course the size - Multistage build vs single stage build
 
 
